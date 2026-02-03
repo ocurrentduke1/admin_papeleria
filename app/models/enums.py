@@ -5,7 +5,7 @@ class users_role(str, Enum):
     EMPLOYEE = "employee"
     CLIENT = "client"
 
-class order_status(str, Enum):
+class order_status_type(str, Enum):
     PENDING = "pending"
     CONFIRMED = "confirmed"
     PREPARING = "preparing"

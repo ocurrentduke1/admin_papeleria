@@ -1,11 +1,11 @@
-from sqlalchemy import Column, DateTime, Integer, String, Boolean, Enum as SqlEnum
+from sqlalchemy import Column, DateTime, String, Boolean, Enum as SqlEnum, Uuid
 from app.core.database import Base
 from app.models.enums import users_role
 
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Uuid, primary_key=True, index=True)
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)
