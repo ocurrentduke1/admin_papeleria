@@ -1,6 +1,7 @@
 from typing import Union
 from fastapi import FastAPI
 from dotenv import load_dotenv
+from app.routes import auth
 import os
 import psycopg2
 
@@ -47,3 +48,5 @@ def health_check():
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
     return {"item_id": item_id, "q": q}
+
+app.include_router(auth.router)

@@ -7,7 +7,7 @@ from app.models.enums import movements_type
 class InventoryMovementBase(BaseModel):
     product_id: UUID
     type: movements_type
-    quantity: int = Field(..., ne=0) # No puede ser cero
+    quantity: int = Field(..., ne=0)
     reason: Optional[str] = None
     reference_id: Optional[UUID] = None
 

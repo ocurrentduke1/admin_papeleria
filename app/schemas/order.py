@@ -3,15 +3,14 @@ from uuid import UUID
 from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
-from app.models.enums import order_status
+from app.models.enums import order_status_type
 # Importamos los schemas del archivo anterior
 from app.schemas.order_item import OrderItemCreate, OrderItemOut
 
 class OrderBase(BaseModel):
-    status: order_status = order_status.PENDING
+    status: order_status_type = order_status_type.PENDING
 
 class OrderCreate(BaseModel):
-    # El cliente envía una lista de estos
     items: List[OrderItemCreate]
 
 class OrderOut(OrderBase):
@@ -19,8 +18,10 @@ class OrderOut(OrderBase):
     client_id: UUID
     total: Decimal
     created_at: datetime
-    # Aquí usamos el esquema de salida del otro archivo
-    order_items: List[OrderItemOut] 
+    order_items: List[OrderItemOut]
+
+class OrderUpdate(BaseModel):
+    status: Optional[order_status_type] = None
 
     class Config:
         from_attributes = True
