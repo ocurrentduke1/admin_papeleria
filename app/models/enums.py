@@ -10,6 +10,7 @@ class order_status_type(str, Enum):
     CONFIRMED = "confirmed"
     PREPARING = "preparing"
     SENT = "sent"
+    DELIVERED = "delivered"
     CANCELLED = "cancelled"
 
 class movements_type(str, Enum):

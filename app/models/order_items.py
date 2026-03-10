@@ -9,8 +9,8 @@ class OrderItem(Base):
     order_id = Column(Uuid, ForeignKey("orders.id"), nullable=False)
     product_id = Column(Uuid, ForeignKey("products.id"), nullable=False)
     quantity = Column(Integer, nullable=False)
-    price = Column(Numeric, nullable=False)
-    subtotal = Column(Numeric, nullable=False)
+    unit_price = Column(Numeric(10, 2), nullable=False)
+    subtotal = Column(Numeric(10, 2), nullable=False)
 
     order = relationship("Order", back_populates="order_items")
     product = relationship("Product")
