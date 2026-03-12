@@ -1,3 +1,5 @@
+from operator import gt
+
 from pydantic import BaseModel, Field
 from uuid import UUID
 from datetime import datetime
@@ -7,7 +9,7 @@ from app.models.enums import movements_type
 class InventoryMovementBase(BaseModel):
     product_id: UUID
     type: movements_type
-    quantity: int = Field(..., ne=0)
+    quantity: int = Field(..., gt=0)
     reason: Optional[str] = None
     reference_id: Optional[UUID] = None
 

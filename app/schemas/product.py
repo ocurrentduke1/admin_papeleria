@@ -11,6 +11,7 @@ class ProductBase(BaseModel):
     description: Optional[str] = None
     price: Decimal = Field(..., gt=0)
     stock: int = Field(default=0, ge=0)
+    stock_min: int = Field(default=0, ge=0)
     supplier_id: UUID
     is_active: bool = True
 
@@ -21,8 +22,11 @@ class ProductCreate(ProductBase):
 # 3. Esquema para ACTUALIZAR: Todo es opcional (PATCH)
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
+    description: Optional[str] = None
     price: Optional[Decimal] = None
     stock: Optional[int] = None
+    supplier_id: Optional[UUID] = None
+    stock_min: Optional[int] = None
     is_active: Optional[bool] = None
 
 # 4. Esquema para RESPONDER: Lo que sale de la API hacia el Frontend

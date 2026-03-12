@@ -12,7 +12,8 @@ class OrderItemCreate(OrderItemBase):
 
 class OrderItemOut(OrderItemBase):
     id: UUID
-    price: Decimal
+    order_id: UUID
+    unit_price: Decimal
     subtotal: Decimal
 
     class Config:

@@ -1,20 +1,20 @@
+from sqlalchemy import UUID
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from app.models.orders import Order
 from app.models.order_items import OrderItem
 from app.models.product import Product
 from app.models.inventory_movement import InventoryMovement
 from app.schemas.order import OrderCreate, OrderUpdate
-from app.models.enums import order_status_type, order_status_type as OrderStatus
+from app.models.enums import order_status_type, order_status_type as OrderStatus, movements_type
 
 # crear orden
-def create_order(db: Session, order_data: OrderCreate):
+def create_order(db: Session, order_data: OrderCreate, user_id: UUID):
     try:
         total = 0.0
 
         # 1️⃣ Crear la orden
         order = Order(
-            user_id=order_data.user_id,
+            client_id=user_id,
             status=order_status_type.PENDING
         )
         db.add(order)
@@ -43,7 +43,8 @@ def create_order(db: Session, order_data: OrderCreate):
                 order_id=order.id,
                 product_id=product.id,
                 quantity=item.quantity,
-                price=product.price
+                unit_price=product.price,
+                subtotal=subtotal
             )
             db.add(order_item)
 
@@ -53,13 +54,15 @@ def create_order(db: Session, order_data: OrderCreate):
             # 4️⃣ Registrar movimiento
             movement = InventoryMovement(
                 product_id=product.id,
+                type=movements_type.OUT,
                 quantity=-item.quantity,
-                reason="order"
+                reason="order",
+                created_by=user_id
             )
             db.add(movement)
 
         # 5️⃣ Guardar total
-        order.total_amount = total
+        order.total = total
 
         db.commit()
         db.refresh(order)
@@ -116,7 +119,7 @@ def cancel_order(db: Session, order_id: str):
 
     order.status = order_status_type.CANCELLED
 
-    for item in order.items:
+    for item in order.order_items:
         product = item.product
         product.stock += item.quantity
 
@@ -133,9 +136,11 @@ def cancel_order(db: Session, order_id: str):
 
 def _is_valid_status_change(current: OrderStatus, new: OrderStatus) -> bool:
     allowed_transitions = {
-        OrderStatus.PENDING: {OrderStatus.PAID, OrderStatus.CANCELLED},
-        OrderStatus.PAID: {OrderStatus.SHIPPED},
-        OrderStatus.SHIPPED: set(),
-        OrderStatus.CANCELLED: set(),
+        OrderStatus.PENDING: {OrderStatus.CONFIRMED, OrderStatus.CANCELLED},
+        OrderStatus.CONFIRMED: {OrderStatus.PREPARING, OrderStatus.CANCELLED},
+        OrderStatus.PREPARING: {OrderStatus.SENT},
+        OrderStatus.SENT: {OrderStatus.DELIVERED},
+        OrderStatus.DELIVERED: set(),
+        OrderStatus.CANCELLED: set()
     }
-    return new in allowed_transitions[current]
+    return new in allowed_transitions.get(current, set())

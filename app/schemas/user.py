@@ -13,6 +13,12 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     password: str = Field(..., min_length=8)
 
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    role: Optional[users_role] = None
+    is_active: Optional[bool] = None
+
 class UserOut(UserBase):
     id: UUID
     created_at: datetime

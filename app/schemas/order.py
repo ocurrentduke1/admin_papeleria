@@ -20,8 +20,8 @@ class OrderOut(OrderBase):
     created_at: datetime
     order_items: List[OrderItemOut]
 
-class OrderUpdate(BaseModel):
-    status: Optional[order_status_type] = None
-
     class Config:
         from_attributes = True
+
+class OrderUpdate(BaseModel):
+    status: Optional[order_status_type] = None

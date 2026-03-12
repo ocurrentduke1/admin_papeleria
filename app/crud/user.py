@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from uuid import UUID
 from app.models.user import User
-from app.schemas.user import UserCreate
+from app.schemas.user import UserCreate, UserUpdate
 from app.core.security import hash_password
 
 
@@ -19,7 +19,7 @@ def create_user(db: Session, user: UserCreate):
     db_user = User(
         name=user.name,
         email=user.email,
-        password=hashed_pwd,
+        password_hash=hashed_pwd,
         role=user.role,  # ⚠️ recomendable forzar CLIENT aquí
         is_active=True
     )
@@ -54,6 +54,12 @@ def get_users(db: Session, skip: int = 0, limit: int = 20):
         .all()
     )
 
+def update_user(db: Session, user: User, data: UserUpdate):
+    for field, value in data.model_dump(exclude_unset=True).items():
+        setattr(user, field, value)
+    db.commit()
+    db.refresh(user)
+    return user
 
 # Desactivar usuario (soft delete)
 def deactivate_user(db: Session, user: User):
