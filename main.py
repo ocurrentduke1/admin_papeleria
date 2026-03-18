@@ -1,52 +1,32 @@
-from typing import Union
+from app.core.config import get_settings
 from fastapi import FastAPI
-from dotenv import load_dotenv
-from app.routes import auth
-import os
-import psycopg2
+from fastapi.middleware.cors import CORSMiddleware
+from app.models import user, supplier, product, orders, order_items, inventory_movement
 
-load_dotenv()
+from app.routes import auth, users
 
-app = FastAPI()
+settings = get_settings()
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-print("Database URL:", DATABASE_URL)
+app = FastAPI(
+    tittle=settings.APP_NAME,
+    debug=settings.DEBUG,
+    description="API para gestionar una papelería",
+    version="1.0.0"
+)
 
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
+#CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-@app.get("/db-test")
-def db_test():
-    try:
-        conn = psycopg2.connect(DATABASE_URL)
-        cursor = conn.cursor()
-        cursor.execute("SELECT 1;")
-        result = cursor.fetchone()
+#routers
+app.include_router(auth.router)
+app.include_router(users.router)
 
-        cursor.close()
-        conn.close()
-
-        return {
-            "status": "success",
-            "database": "connected",
-            "result": result[0]
-        }
-    
-    except Exception as e:
-        return {
-            "status": "error",
-            "database": "not connected",
-            "error": str(e)
-        }
-
-@app.get("/health")
+@app.get("/health", tags=["health"])
 def health_check():
     return {"status": "ok"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
-
-app.include_router(auth.router)
