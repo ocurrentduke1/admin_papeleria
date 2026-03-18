@@ -1,3 +1,5 @@
+import uuid
+
 from sqlalchemy import Column,Uuid, Integer, ForeignKey, Numeric
 from sqlalchemy.orm import relationship
 from app.core.database import Base
@@ -5,7 +7,7 @@ from app.core.database import Base
 class OrderItem(Base):
     __tablename__ = "order_items"
 
-    id = Column(Uuid, primary_key=True, index=True)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4, index=True)
     order_id = Column(Uuid, ForeignKey("orders.id"), nullable=False)
     product_id = Column(Uuid, ForeignKey("products.id"), nullable=False)
     quantity = Column(Integer, nullable=False)

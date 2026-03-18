@@ -3,6 +3,7 @@ from sqlalchemy import Boolean, Column, String, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from app.core.database import Base
+from datetime import datetime
 
 
 class Supplier(Base):
@@ -14,6 +15,6 @@ class Supplier(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     phone = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     products = relationship("Product", back_populates="supplier")
