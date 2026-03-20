@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.models import user, supplier, product, orders, order_items, inventory_movement
 
-from app.routes import auth, users, suppliers
+from app.routes import auth, users, suppliers, products
 
 settings = get_settings()
 
@@ -27,6 +27,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(suppliers.router)
+app.include_router(products.router)
 
 @app.get("/health", tags=["health"])
 def health_check():

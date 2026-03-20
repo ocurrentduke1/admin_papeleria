@@ -1,9 +1,16 @@
 from sqlalchemy.orm import Session
 from app.models.product import Product
+from app.models.supplier import Supplier
 from app.schemas.product import ProductCreate, ProductUpdate
 
 # crear producto
 def create_product(db: Session, product: ProductCreate):
+
+    # Verificar que el proveedor existe
+    supplier = db.query(Supplier).filter(Supplier.id == product.supplier_id).first()
+    if not supplier:
+        raise ValueError(f"El proveedor con id {product.supplier_id} no existe")
+    
     db_product = Product(**product.model_dump())
     db.add(db_product)
     db.commit()
