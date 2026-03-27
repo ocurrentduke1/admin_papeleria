@@ -15,7 +15,7 @@ class OrderCreate(BaseModel):
 
 class OrderOut(OrderBase):
     id: UUID
-    client_id: UUID
+    user_id: UUID
     total: Decimal
     created_at: datetime
     order_items: List[OrderItemOut]

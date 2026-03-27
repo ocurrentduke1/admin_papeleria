@@ -1,7 +1,6 @@
 from datetime import datetime
 import uuid
-from sqlalchemy import Column, DateTime, Integer, String, Numeric, Boolean, ForeignKey
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy import Column, DateTime, Integer, String, Numeric, Boolean, ForeignKey, Uuid
 from sqlalchemy.orm import relationship
 from app.core.database import Base
 
@@ -9,13 +8,13 @@ from app.core.database import Base
 class Product(Base):
     __tablename__ = "products"
 
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, index=True)
+    id = Column(Uuid, primary_key=True, default=uuid.uuid4, index=True)
     name = Column(String, index=True, nullable=False)
     sku = Column(String, unique=True, index=True, nullable=False)
     description = Column(String, nullable=True)
     price = Column(Numeric(10, 2), nullable=False)
     stock = Column(Integer, default=0, nullable=False)
-    supplier_id = Column(UUID(as_uuid=True), ForeignKey("suppliers.id", ondelete="RESTRICT"), nullable=False)
+    supplier_id = Column(Uuid, ForeignKey("suppliers.id", ondelete="RESTRICT"), nullable=False)
     is_active = Column(Boolean, default=True)
     stock_min = Column(Integer, default=0, nullable=False)
 

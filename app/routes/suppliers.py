@@ -29,7 +29,7 @@ def get_supplier_by_id(
     if not supplier:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Proveedor no encontrado"
+            detail="Supplier not found"
         )
     return supplier
 
@@ -44,7 +44,7 @@ def create_new_supplier(
     if current_user.role != users_role.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tienes permisos para realizar esta acción"
+            detail="don´t have permissions to create supplier"
         )
     return create_supplier(db, supplier_data)
 
@@ -60,13 +60,13 @@ def update_existing_supplier(
     if current_user.role != users_role.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tienes permisos para realizar esta acción"
+            detail="don´t have permissions to update supplier"
         )
     supplier = get_supplier(db, supplier_id)
     if not supplier:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Proveedor no encontrado"
+            detail="Supplier not found"
         )
     return update_supplier(db, supplier, supplier_data)
 
@@ -81,12 +81,12 @@ def deactivate_existing_supplier(
     if current_user.role != users_role.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tienes permisos para realizar esta acción"
+            detail="don´t have permissions to deactivate supplier"
         )
     supplier = get_supplier(db, supplier_id)
     if not supplier:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Proveedor no encontrado"
+            detail="Supplier not found"
         )
     deactivate_supplier(db, supplier)

@@ -29,7 +29,7 @@ def get_product_by_id(
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Producto no encontrado"
+            detail="Product not found"
         )
     return product
 
@@ -44,11 +44,11 @@ def create_new_product(
     if current_user.role not in [users_role.ADMIN, users_role.EMPLOYEE]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tienes permisos para realizar esta acción"
+            detail="don´t have permissions to create product"
         )
     try:
         return create_product(db, product_data)
-    except Exception as e:
+    except ValueError as e:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=str(e)
@@ -66,13 +66,13 @@ def update_existing_product(
     if current_user.role not in [users_role.ADMIN, users_role.EMPLOYEE]:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tienes permisos para realizar esta acción"
+            detail="don´t have permissions to update product"
         )
     product = get_product(db, product_id)
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Producto no encontrado"
+            detail="Product not found"
         )
     return update_product(db, product, product_data)
 
@@ -87,12 +87,12 @@ def delete_existing_product(
     if current_user.role != users_role.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tienes permisos para realizar esta acción"
+            detail="don´t have permissions to delete product"
         )
     product = get_product(db, product_id)
     if not product:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Producto no encontrado"
+            detail="Product not found"
         )
     delete_product(db, product)

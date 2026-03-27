@@ -1,3 +1,4 @@
+from uuid import UUID
 from sqlalchemy.orm import Session
 from app.models.product import Product
 from app.models.supplier import Supplier
@@ -9,7 +10,12 @@ def create_product(db: Session, product: ProductCreate):
     # Verificar que el proveedor existe
     supplier = db.query(Supplier).filter(Supplier.id == product.supplier_id).first()
     if not supplier:
-        raise ValueError(f"El proveedor con id {product.supplier_id} no existe")
+        raise ValueError(f"the supplier {product.supplier_id} doesn´t exist")
+
+    # Verificar SKU duplicado
+    existing = db.query(Product).filter(Product.sku == product.sku).first()
+    if existing:
+        raise ValueError(f"SKU '{product.sku}' is already registered")
     
     db_product = Product(**product.model_dump())
     db.add(db_product)
@@ -18,7 +24,7 @@ def create_product(db: Session, product: ProductCreate):
     return db_product
 
 # obtener producto por id
-def get_product(db: Session, product_id: str):
+def get_product(db: Session, product_id: UUID):
     return db.query(Product).filter(Product.id == product_id).first()
 
 # obtener todos los productos

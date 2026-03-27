@@ -1,4 +1,4 @@
-from sqlalchemy import UUID
+from uuid import UUID
 from sqlalchemy.orm import Session
 from app.models.orders import Order
 from app.models.order_items import OrderItem
@@ -10,12 +10,13 @@ from app.models.enums import order_status_type, order_status_type as OrderStatus
 # crear orden
 def create_order(db: Session, order_data: OrderCreate, user_id: UUID):
     try:
-        total = 0.0
+        total = 0
 
         # 1️⃣ Crear la orden
         order = Order(
-            client_id=user_id,
-            status=order_status_type.PENDING
+            user_id=user_id,
+            status=order_status_type.PENDING,
+            total = 0
         )
         db.add(order)
         db.flush()  # obtiene order.id sin commit
@@ -29,11 +30,11 @@ def create_order(db: Session, order_data: OrderCreate, user_id: UUID):
             )
 
             if not product:
-                raise ValueError(f"Producto {item.product_id} no existe")
+                raise ValueError(f"Product {item.product_id} does not exist")
 
             if product.stock < item.quantity:
                 raise ValueError(
-                    f"Stock insuficiente para {product.name}"
+                    f"Insufficient stock for {product.name}"
                 )
 
             subtotal = product.price * item.quantity
@@ -73,7 +74,7 @@ def create_order(db: Session, order_data: OrderCreate, user_id: UUID):
         raise
 
 # obtener orden por id
-def get_order(db: Session, order_id: str):
+def get_order(db: Session, order_id: UUID):
     return (
         db.query(Order)
         .filter(Order.id == order_id)
@@ -87,7 +88,7 @@ def get_orders(db: Session):
 # actualizar orden
 def update_order(
     db: Session,
-    order_id: int,
+    order_id: UUID,
     order_data: OrderUpdate
 ):
     order = get_order(db, order_id)
@@ -99,7 +100,7 @@ def update_order(
     if order_data.status:
         if not _is_valid_status_change(order.status, order_data.status):
             raise ValueError(
-                f"No se puede cambiar de {order.status} a {order_data.status}"
+                f"Invalid status change from {order.status} to {order_data.status}"
             )
         order.status = order_data.status
 
@@ -108,14 +109,14 @@ def update_order(
     return order
 
 # eliminar orden
-def cancel_order(db: Session, order_id: str):
+def cancel_order(db: Session, order_id: UUID, cancelled_by: UUID):
     order = get_order(db, order_id)
 
     if not order:
         return None
 
     if order.status != order_status_type.PENDING:
-        raise ValueError("Solo órdenes pendientes se pueden cancelar")
+        raise ValueError("Only pending orders can be cancelled")
 
     order.status = order_status_type.CANCELLED
 
@@ -125,8 +126,10 @@ def cancel_order(db: Session, order_id: str):
 
         movement = InventoryMovement(
             product_id=product.id,
+            type=movements_type.IN,
             quantity=item.quantity,
-            reason="order_cancelled"
+            reason="order_cancelled",
+            created_by=cancelled_by
         )
         db.add(movement)
 

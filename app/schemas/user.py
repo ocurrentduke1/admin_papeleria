@@ -19,6 +19,14 @@ class UserUpdate(BaseModel):
     role: Optional[users_role] = None
     is_active: Optional[bool] = None
 
+class UserSelfUpdate(BaseModel):
+    name: Optional[str] = Field(None, max_length=150)
+    email: Optional[EmailStr] = None
+
+class PasswordChange(BaseModel):
+    current_password: str
+    new_password: str = Field(..., min_length=8)
+
 class UserOut(UserBase):
     id: UUID
     created_at: datetime
