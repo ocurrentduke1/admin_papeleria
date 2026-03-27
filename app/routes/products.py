@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from uuid import UUID
 from app.api.deps import get_db, get_current_user
-from app.crud.product import get_product, get_products, create_product, update_product, delete_product
+from app.crud.product import get_product, get_products, get_low_stock_products, create_product, update_product, delete_product
 from app.schemas.product import ProductCreate, ProductOut, ProductUpdate
 from app.models.user import User
 from app.models.enums import users_role
@@ -16,6 +16,20 @@ def list_products(
     current_user: User = Depends(get_current_user)
 ):
     return get_products(db)
+
+
+# Productos con stock bajo el mínimo (debe ir ANTES de /{product_id})
+@router.get("/low-stock", response_model=list[ProductOut])
+def list_low_stock_products(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    if current_user.role not in [users_role.ADMIN, users_role.EMPLOYEE]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="don´t have permissions to view low stock products"
+        )
+    return get_low_stock_products(db)
 
 
 # Obtener producto por ID

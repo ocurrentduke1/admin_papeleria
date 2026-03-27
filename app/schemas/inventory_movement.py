@@ -1,21 +1,29 @@
-from operator import gt
-
 from pydantic import BaseModel, Field
 from uuid import UUID
 from datetime import datetime
 from typing import Optional
 from app.models.enums import movements_type
 
+
 class InventoryMovementBase(BaseModel):
     product_id: UUID
     type: movements_type
-    quantity: int = Field(..., gt=0)
+    quantity: int
     reason: Optional[str] = None
     reference_id: Optional[UUID] = None
+
 
 class InventoryMovementCreate(InventoryMovementBase):
     # El created_by lo tomaremos del token del usuario autenticado en el endpoint
     pass
+
+
+class InventoryAdjustmentCreate(BaseModel):
+    product_id: UUID
+    type: movements_type
+    quantity: int = Field(..., gt=0)
+    reason: str = Field(..., min_length=1)
+
 
 class InventoryMovementOut(InventoryMovementBase):
     id: UUID

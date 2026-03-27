@@ -29,7 +29,15 @@ def get_product(db: Session, product_id: UUID):
 
 # obtener todos los productos
 def get_products(db: Session):
-    return db.query(Product).all()
+    return db.query(Product).filter(Product.is_active == True).all()
+
+# obtener productos con stock bajo el mínimo
+def get_low_stock_products(db: Session):
+    return (
+        db.query(Product)
+        .filter(Product.is_active == True, Product.stock <= Product.stock_min)
+        .all()
+    )
 
 # actualizar producto
 def update_product(db: Session, product: Product, data: ProductUpdate):
